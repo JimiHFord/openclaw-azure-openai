@@ -1,0 +1,65 @@
+// OpenClaw config for Azure OpenAI behind a custom domain / API gateway
+// This is the most common enterprise setup
+
+{
+  env: {
+    vars: {
+      // Your API key (may be Azure key or gateway key depending on setup)
+      AZURE_OPENAI_API_KEY: "your-api-key",
+      
+      // API version - check your gateway documentation for supported versions
+      AZURE_OPENAI_API_VERSION: "2024-02-01",
+      
+      // Your custom domain base URL
+      // Format: https://your-domain.com/openai/v1
+      // The client appends: /deployments/{deployment}/chat/completions?api-version={version}
+      AZURE_OPENAI_BASE_URL: "https://ai.company.com/openai/v1",
+      
+      // Map model IDs to your actual deployment names
+      AZURE_OPENAI_DEPLOYMENT_NAME_MAP: "gpt-4o=prod-gpt4o,gpt-4o-mini=prod-mini"
+    }
+  },
+
+  models: {
+    providers: {
+      "azure": {
+        // IMPORTANT: Must use azure-openai-responses, not openai-completions
+        api: "azure-openai-responses",
+        
+        // Optional: extra headers if your gateway requires them
+        // headers: {
+        //   "X-Gateway-Key": "${GATEWAY_API_KEY}"
+        // },
+        
+        models: [
+          {
+            id: "gpt-4o",  // This gets mapped to deployment via AZURE_OPENAI_DEPLOYMENT_NAME_MAP
+            name: "GPT-4o (Azure)",
+            contextWindow: 128000,
+            maxTokens: 16384,
+            input: ["text", "image"]
+          },
+          {
+            id: "gpt-4o-mini",
+            name: "GPT-4o Mini (Azure)",
+            contextWindow: 128000,
+            maxTokens: 16384,
+            input: ["text", "image"]
+          }
+        ]
+      }
+    }
+  },
+
+  agents: {
+    defaults: {
+      model: {
+        primary: "azure/gpt-4o",
+        fallbacks: ["azure/gpt-4o-mini"]
+      }
+    }
+  }
+}
+
+// Resulting URL construction:
+// https://ai.company.com/openai/v1/deployments/prod-gpt4o/chat/completions?api-version=2024-02-01
