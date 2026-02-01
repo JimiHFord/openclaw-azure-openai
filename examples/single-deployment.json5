@@ -4,8 +4,17 @@
 {
   env: {
     vars: {
-      // Set your Azure OpenAI API key here or via environment variable
-      // AZURE_OPENAI_API_KEY: "your-key-here"
+      // Required: your Azure OpenAI API key
+      AZURE_OPENAI_API_KEY: "your-key-here",
+      
+      // Required: just the resource name (not the full URL)
+      AZURE_OPENAI_RESOURCE_NAME: "your-resource-name",
+      
+      // Optional: API version (defaults to "v1")
+      AZURE_OPENAI_API_VERSION: "2024-02-01",
+      
+      // Optional: map model IDs to deployment names if they differ
+      // AZURE_OPENAI_DEPLOYMENT_NAME_MAP: "gpt-4o=my-deployment-name"
     }
   },
 
@@ -13,25 +22,14 @@
     providers: {
       // Provider name - use this as prefix when referencing models
       "azure-openai": {
-        // Your Azure OpenAI endpoint with deployment name and API version
-        baseUrl: "https://YOUR-RESOURCE-NAME.openai.azure.com/openai/deployments/YOUR-DEPLOYMENT-NAME?api-version=2024-02-01",
+        // IMPORTANT: Use azure-openai-responses, NOT openai-completions
+        // The standard openai-completions breaks with Azure's URL format
+        api: "azure-openai-responses",
         
-        // Reference to your API key (from env or inline)
-        apiKey: "${AZURE_OPENAI_API_KEY}",
-        
-        // Use OpenAI-compatible completions API
-        api: "openai-completions",
-        
-        // Azure uses api-key header instead of Authorization: Bearer
-        headers: {
-          "api-key": "${AZURE_OPENAI_API_KEY}"
-        },
-        authHeader: false,
-        
-        // Define the model(s) available through this deployment
+        // Define the model(s) available through this provider
         models: [
           {
-            id: "gpt-4o",
+            id: "gpt-4o",  // Used for deployment name lookup
             name: "GPT-4o (Azure)",
             contextWindow: 128000,
             maxTokens: 16384,

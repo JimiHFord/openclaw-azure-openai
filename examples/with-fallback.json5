@@ -5,7 +5,10 @@
   env: {
     vars: {
       // Azure credentials
-      // AZURE_OPENAI_API_KEY: "your-azure-key"
+      AZURE_OPENAI_API_KEY: "your-azure-key",
+      AZURE_OPENAI_RESOURCE_NAME: "my-openai-resource",
+      AZURE_OPENAI_API_VERSION: "2024-02-01",
+      AZURE_OPENAI_DEPLOYMENT_NAME_MAP: "gpt-4o=gpt4o-prod"
       
       // Direct OpenAI credentials (for fallback)
       // OPENAI_API_KEY: "sk-..."
@@ -16,11 +19,7 @@
     providers: {
       // Primary: Azure OpenAI
       "azure": {
-        baseUrl: "https://my-resource.openai.azure.com/openai/deployments/gpt-4o?api-version=2024-02-01",
-        apiKey: "${AZURE_OPENAI_API_KEY}",
-        api: "openai-completions",
-        headers: { "api-key": "${AZURE_OPENAI_API_KEY}" },
-        authHeader: false,
+        api: "azure-openai-responses",
         models: [
           {
             id: "gpt-4o",
@@ -31,7 +30,7 @@
           }
         ]
       }
-      // Note: OpenAI is available by default when OPENAI_API_KEY is set
+      // Note: Standard OpenAI is available by default when OPENAI_API_KEY is set
     }
   },
 
