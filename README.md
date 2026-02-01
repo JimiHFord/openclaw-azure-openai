@@ -2,6 +2,31 @@
 
 Connect [OpenClaw](https://github.com/openclaw/openclaw) to Azure OpenAI deployments — including those behind custom domains or API gateways.
 
+## Prerequisites
+
+- **Node.js 20+**: Install via [nodejs.org](https://nodejs.org/) or your package manager
+  ```bash
+  # macOS (Homebrew)
+  brew install node
+
+  # Ubuntu/Debian
+  curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
+  sudo apt-get install -y nodejs
+
+  # Windows (winget)
+  winget install OpenJS.NodeJS.LTS
+  ```
+
+- **OpenClaw**: Install globally via npm
+  ```bash
+  npm install -g openclaw
+
+  # First-time setup
+  openclaw init
+  ```
+
+- **Azure OpenAI resource**: An active deployment in [Azure OpenAI Studio](https://oai.azure.com/)
+
 ## Why Azure OpenAI?
 
 - **Enterprise security**: Private endpoints, VNETs, managed identity
