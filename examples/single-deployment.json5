@@ -1,0 +1,58 @@
+// OpenClaw config snippet for a single Azure OpenAI deployment
+// Copy the relevant sections to your ~/.openclaw/config.json5
+
+{
+  env: {
+    vars: {
+      // Set your Azure OpenAI API key here or via environment variable
+      // AZURE_OPENAI_API_KEY: "your-key-here"
+    }
+  },
+
+  models: {
+    providers: {
+      // Provider name - use this as prefix when referencing models
+      "azure-openai": {
+        // Your Azure OpenAI endpoint with deployment name and API version
+        baseUrl: "https://YOUR-RESOURCE-NAME.openai.azure.com/openai/deployments/YOUR-DEPLOYMENT-NAME?api-version=2024-02-01",
+        
+        // Reference to your API key (from env or inline)
+        apiKey: "${AZURE_OPENAI_API_KEY}",
+        
+        // Use OpenAI-compatible completions API
+        api: "openai-completions",
+        
+        // Azure uses api-key header instead of Authorization: Bearer
+        headers: {
+          "api-key": "${AZURE_OPENAI_API_KEY}"
+        },
+        authHeader: false,
+        
+        // Define the model(s) available through this deployment
+        models: [
+          {
+            id: "gpt-4o",
+            name: "GPT-4o (Azure)",
+            contextWindow: 128000,
+            maxTokens: 16384,
+            input: ["text", "image"],
+            // Optional: pricing for cost tracking
+            cost: {
+              input: 2.50,    // $ per 1M input tokens
+              output: 10.00   // $ per 1M output tokens
+            }
+          }
+        ]
+      }
+    }
+  },
+
+  agents: {
+    defaults: {
+      model: {
+        // Reference format: provider-name/model-id
+        primary: "azure-openai/gpt-4o"
+      }
+    }
+  }
+}

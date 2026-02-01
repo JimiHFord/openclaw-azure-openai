@@ -1,0 +1,48 @@
+// OpenClaw config with Azure OpenAI primary + direct OpenAI fallback
+// Useful for redundancy or when Azure has quota limits
+
+{
+  env: {
+    vars: {
+      // Azure credentials
+      // AZURE_OPENAI_API_KEY: "your-azure-key"
+      
+      // Direct OpenAI credentials (for fallback)
+      // OPENAI_API_KEY: "sk-..."
+    }
+  },
+
+  models: {
+    providers: {
+      // Primary: Azure OpenAI
+      "azure": {
+        baseUrl: "https://my-resource.openai.azure.com/openai/deployments/gpt-4o?api-version=2024-02-01",
+        apiKey: "${AZURE_OPENAI_API_KEY}",
+        api: "openai-completions",
+        headers: { "api-key": "${AZURE_OPENAI_API_KEY}" },
+        authHeader: false,
+        models: [
+          {
+            id: "gpt-4o",
+            name: "GPT-4o (Azure)",
+            contextWindow: 128000,
+            maxTokens: 16384,
+            input: ["text", "image"]
+          }
+        ]
+      }
+      // Note: OpenAI is available by default when OPENAI_API_KEY is set
+    }
+  },
+
+  agents: {
+    defaults: {
+      model: {
+        // Try Azure first
+        primary: "azure/gpt-4o",
+        // Fall back to direct OpenAI if Azure fails (quota, outage, etc.)
+        fallbacks: ["openai/gpt-4o"]
+      }
+    }
+  }
+}

@@ -1,0 +1,84 @@
+// OpenClaw config snippet for multiple Azure OpenAI deployments
+// Useful when you have different models deployed (GPT-4o, GPT-4o-mini, etc.)
+
+{
+  env: {
+    vars: {
+      // All deployments can share the same API key if in the same resource
+      // AZURE_OPENAI_API_KEY: "your-key-here"
+    }
+  },
+
+  models: {
+    providers: {
+      // GPT-4o deployment (main/expensive)
+      "azure-gpt4o": {
+        baseUrl: "https://my-resource.openai.azure.com/openai/deployments/gpt-4o-prod?api-version=2024-02-01",
+        apiKey: "${AZURE_OPENAI_API_KEY}",
+        api: "openai-completions",
+        headers: { "api-key": "${AZURE_OPENAI_API_KEY}" },
+        authHeader: false,
+        models: [
+          {
+            id: "gpt-4o",
+            name: "GPT-4o (Azure)",
+            contextWindow: 128000,
+            maxTokens: 16384,
+            input: ["text", "image"],
+            cost: { input: 2.50, output: 10.00 }
+          }
+        ]
+      },
+
+      // GPT-4o-mini deployment (faster/cheaper)
+      "azure-gpt4o-mini": {
+        baseUrl: "https://my-resource.openai.azure.com/openai/deployments/gpt-4o-mini-prod?api-version=2024-02-01",
+        apiKey: "${AZURE_OPENAI_API_KEY}",
+        api: "openai-completions",
+        headers: { "api-key": "${AZURE_OPENAI_API_KEY}" },
+        authHeader: false,
+        models: [
+          {
+            id: "gpt-4o-mini",
+            name: "GPT-4o Mini (Azure)",
+            contextWindow: 128000,
+            maxTokens: 16384,
+            input: ["text", "image"],
+            cost: { input: 0.15, output: 0.60 }
+          }
+        ]
+      },
+
+      // o1 reasoning deployment (if available)
+      "azure-o1": {
+        baseUrl: "https://my-resource.openai.azure.com/openai/deployments/o1-prod?api-version=2024-02-01",
+        apiKey: "${AZURE_OPENAI_API_KEY}",
+        api: "openai-completions",
+        headers: { "api-key": "${AZURE_OPENAI_API_KEY}" },
+        authHeader: false,
+        models: [
+          {
+            id: "o1",
+            name: "o1 (Azure)",
+            contextWindow: 200000,
+            maxTokens: 100000,
+            input: ["text", "image"],
+            reasoning: true,  // Enable reasoning mode
+            cost: { input: 15.00, output: 60.00 }
+          }
+        ]
+      }
+    }
+  },
+
+  agents: {
+    defaults: {
+      model: {
+        // Use GPT-4o as primary
+        primary: "azure-gpt4o/gpt-4o",
+        // Fall back to mini if 4o fails
+        fallbacks: ["azure-gpt4o-mini/gpt-4o-mini"]
+      }
+    }
+  }
+}
